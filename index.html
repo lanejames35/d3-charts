@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<title>Work in progress</title>
+		<meta charset="utf-8">
+	</head>
+	<body>
+		<h1>Durham Residents who drank alcohol in the past year</h1>
+		<div id="theChart"></div>
+		<!-- load the d3.js library -->
+		<script src="https://d3js.org/d3.v5.min.js"></script>
+		<script>
+			// set the dimensions and margins of the graph
+			var margin = {top: 20, right: 20, bottom: 30, left: 40},
+				width = 960 - margin.left - margin.right,
+				height = 500 - margin.top - margin.bottom;
+
+			// set the ranges
+			// x0 = outer scale for the groups (i.e. demographics)
+			// x1 = inner scale for the response options
+			var x0 = d3.scaleBand()
+					  .range([0, width])
+					  .padding(0.1);
+			var x1 = d3.scaleBand().padding(0.05);
+			var y = d3.scaleLinear()
+					  .range([height, 0]);
+					  
+			// append the svg object to the body of the page
+			// append a 'group' element to 'svg'
+			// moves the 'group' element to the top left margin
+			var svg = d3.select("#theChart").append("svg")
+				.attr("width", width + margin.left + margin.right)
+				.attr("height", height + margin.top + margin.bottom)
+			  .append("g")
+				.attr("transform", 
+					  "translate(" + margin.left + "," + margin.top + ")");
+
+			// get the data
+			// create the array "raw" to hold the input
+			d3.csv("alcohol2.csv").then(function(data) {
+			  // re-format numeric data
+			  data.forEach(function(d){
+				d.percent = +d.percent;
+				d.ucl = +d.ucl;
+				d.lcl = +d.lcl;
+			  });	
+			  // Get the groups
+			  var groups = d3.nest()
+			    .key(function(d){ return d.sex; })
+			    .entries(data);
+		      console.log(groups);
+			
+			 
+			 
+			  // Scale for the sexes
+			  x0.domain( groups.map(function(i){ return i.key }) );
+			  console.log(x0.domain());
+			  // Scale for the responses (yes/no)
+			  x1.domain( groups.map(function(d, i){ return d.values[i].response; }) ).range([0, x0.bandwidth()]);
+			  console.log(x1.domain());
+			  // Scale for the outcome (percent, ucl, lcl, etc.)
+			  y.domain([0,100]);
+			  
+			  // append the rectangles for the bar chart
+			  // First, append a placeholder for each sex
+			  // TODO legend
+			  var group = svg.selectAll("g")
+				  .data(groups)
+				.enter().append("g")
+				  .attr("transform", function(d) { return "translate(" + x0(d.key) + ",0)"; } );
+			  var response = group.selectAll("rect")
+				  .data(function(d){return d.values.map(function(j){ return {key:j.response, value:j.percent}; }); });
+			  // append a new bar for each new DOM element
+			  response.enter().append("rect")
+				  .attr("class", function(d){ return "bar-" + d.key.toLowerCase() })
+				  .attr("x", function(d){ return x1(d.key); })
+				  .attr("width", x1.bandwidth())
+				  .attr("y", function(d) { return y(d.value); })
+				  .attr("height", function(d) { return height - y(d.value); });
+				  
+				  
+			   // follow same data mapping as line 71 but using UCL / LCL
+			   
+
+			  // add the x Axis
+			  svg.append("g")
+				  .attr("transform", "translate(0," + height + ")")
+				  .call(d3.axisBottom(x0));
+
+			  // add the y Axis
+			  svg.append("g")
+				  .call(d3.axisLeft(y));
+			});
+			
+		</script>
+	</body>
+</html>
