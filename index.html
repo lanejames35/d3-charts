@@ -22,24 +22,40 @@
 			stroke-width: 1.5;
 			fill: none;
 		  }
-		  .pretty{
-		    width: 1200px;
-			overflow: auto;
-		  }
 		</style>
 	</head>
 	<body>
 		<main class="container" role="main">
 			<div class="row">
 				<div class="col-xs-12">
-					<h1>Durham Residents who drank alcohol in the past year</h1>
+					<h1>Charting with D3!</h1>
+					<p>This page is a proof of concept for a RRFSS chart generator. The idea here is to house a summarized dataset as open data
+					   then use <a href="https://d3js.org/">D3.js</a> to fetch this data set and turn it into a pretty graphic.</a>
+					<p>Future iterations will accept user input to customize the apperance of the graphic. Data and code are shown below.</p>
+					<p>Hop on over to <a href="https://github.com/lanejames35/d3-charts">GitHub</a> to fork or download the source! And stay tuned for updates...</p>
+					<h2>The final product<span class="small"> -- psst! zoom in, I'm no static image</span> 😀</h2>
 					<div id="theChart"></div>
 				</div>
 			</div>
-			<div class="col-xs-12 col-md-6">	
-				<div class="pretty">
-					<h2>JS code</h2>
+			<div class="row">
+				<div class="col-xs-12">
+					<h2>alcohol2.csv</h2>
 					<pre class="prettyprint linenums">
+sex,response,count,percent,lcl,ucl
+"Male","Yes",632,85.0,82.1,88.0
+"Male","No",120,15.0,12.0,17.9
+"Male","I don't know",111,20,12,22
+"Female","Yes",871,60,59.2,62.0
+"Female","No",182,40,33.0,42
+"Female","I don't know",111,10,5,12
+					</pre>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12">	
+					<div class="pretty">
+						<h2>JS code</h2>
+						<pre class="prettyprint linenums">
 // set the dimensions and margins of the graph
 var margin = {top: 20, right: 20, bottom: 30, left: 40},
 	width = 960 - margin.left - margin.right,
@@ -65,10 +81,12 @@ var svg = d3.select("#theChart").append("svg")
 	.attr("transform", 
 		  "translate(" + margin.left + "," + margin.top + ")");
 
-// get the data
-// create the array "raw" to hold the input
+// Get the data
+// In production this file would be retreived 
+// from the Durham Region Open Data API.
+// For now, a static file will do!
 d3.csv("alcohol2.csv").then(function(data) {
-  // re-format numeric data
+  // re-format char to numeric data
   data.forEach(function(d){
 	d.percent = +d.percent;
 	d.ucl = +d.ucl;
@@ -312,11 +330,18 @@ d3.csv("alcohol2.csv").then(function(data) {
 		  // add the y Axis
 		  svg.append("g")
 			  .call(d3.axisLeft(y));
-			  
+		  svg.append("text")
+			  .attr("text-anchor", "end")
+			  .attr("y", 6)
+			  .attr("dy", ".75em")
+			  .attr("transform", "rotate(-90)")
+			  .attr("font-family", "sans-serif")
+			  .text("Per cent");
+		  
 		  // add the legend
 			var legend = svg.append("g")
 			  .attr("font-family", "sans-serif")
-			  .attr("font-size", 10)
+			  .attr("font-size", 14)
 			  .attr("text-anchor", "end")
 			.selectAll("g")
 			.data(res.map(function(d){ return d.key }) )
