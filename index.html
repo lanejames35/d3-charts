@@ -95,8 +95,44 @@
 			  
 			  
 		   // follow same data mapping as line 71 but using UCL / LCL
-		   
-
+		   var vLine = group.selectAll(".verticalLines")
+			  .data(function(d){return d.values.map(function(j){ return {key:j.response, whiskers:[j.lcl,j.ucl]}; }); })
+			  .enter()
+			  .append("line")
+			  .attr("x1", function(d){ return x1(d.key) + x1.bandwidth()/2; })
+			  .attr("y1", function(d){ return y(d.whiskers[0]); })
+			  .attr("x2", function(d){ return x1(d.key) + x1.bandwidth()/2; })
+			  .attr("y2", function(d){ return y(d.whiskers[1]); })
+			  .attr("stroke", "#000")
+			  .attr("stroke-width", 2)
+			  .attr("fill", "none");
+			
+		   var hLine1 = group.selectAll(".verticalLines")
+			  .data(function(d){return d.values.map(function(j){ return {key:j.response, whiskers:[j.lcl,j.ucl]}; }); })
+			  .enter()
+			  .append("line")
+			  .attr("x1", function(d){ return x1(d.key); })
+			  .attr("y1", function(d){ return y(d.whiskers[0]); })
+			  .attr("x2", function(d){ return x1(d.key) + x1.bandwidth()/10; })
+			  .attr("y2", function(d){ return y(d.whiskers[0]); })
+   			  .attr("transform", function(d) { return "translate(" + x1.bandwidth()*9/20 + ",0)"; } )
+			  .attr("stroke", "#000")
+			  .attr("stroke-width", 2)
+			  .attr("fill", "none");
+	
+		   var hLine2 = group.selectAll(".verticalLines")
+			  .data(function(d){return d.values.map(function(j){ return {key:j.response, whiskers:[j.lcl,j.ucl]}; }); })
+			  .enter()
+			  .append("line")
+			  .attr("x1", function(d){ return x1(d.key); })
+			  .attr("y1", function(d){ return y(d.whiskers[1]); })
+			  .attr("x2", function(d){ return x1(d.key) + x1.bandwidth()/10; })
+			  .attr("y2", function(d){ return y(d.whiskers[1]); })
+   			  .attr("transform", function(d) { return "translate(" + x1.bandwidth()*9/20 + ",0)"; } )
+			  .attr("stroke", "#000")
+			  .attr("stroke-width", 2)
+			  .attr("fill", "none");
+			  
 		  // add the x Axis
 		  svg.append("g")
 			  .attr("transform", "translate(0," + height + ")")

@@ -1,7 +1,7 @@
 sex,response,count,percent,lcl,ucl
 Male,Yes,632,85.0,82.1,88.0
 Male,No,120,15.0,12.0,17.9
-Male,I don't know,111,20,12,12
-Female,Yes,871,60,79.2,85.0
-Female,No,182,40,15.0,20.8
-Female,I don't know,111,10,10,10
+Male,I don't know,111,20,12,22
+Female,Yes,871,60,59.2,62.0
+Female,No,182,40,33.0,42
+Female,I don't know,111,10,5,12
