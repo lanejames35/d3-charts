@@ -6,6 +6,7 @@
 		<!-- Google Code Prettify Licensed under Apache 2.0 -->
 		<link href="theme.min.css" rel="stylesheet">
 		<link href="https://fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet"> 
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
 		<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
 		<style>
 		  .bar-0, .legend-0{
@@ -19,8 +20,6 @@
 		  }
 		  .whisker, .whisker-bottom, .whisker-top{
 		    stroke: #000;
-			stroke-width: 1.5;
-			fill: none;
 		  }
 		</style>
 	</head>
@@ -33,7 +32,7 @@
 					   then use <a href="https://d3js.org/">D3.js</a> to fetch this data set and turn it into a pretty graphic.</a>
 					<p>Future iterations will accept user input to customize the apperance of the graphic. Data and code are shown below.</p>
 					<p>Hop on over to <a href="https://github.com/lanejames35/d3-charts">GitHub</a> to fork or download the source! And stay tuned for updates...</p>
-					<h2>The final product<span class="small"> -- psst! zoom in, I'm no static image</span> 😀</h2>
+					<h2>The final product<span class="small"> -- psst! zoom in, I'm no static image </span><i class="far fa-smile-beam"></i></h2>
 					<div id="theChart"></div>
 				</div>
 			</div>
@@ -223,7 +222,7 @@ d3.csv("alcohol2.csv").then(function(data) {
 		var x1 = d3.scaleBand().padding(0.05);
 		var y = d3.scaleLinear()
 				  .range([height, 0]);
-				  
+
 		// append the svg object to the body of the page
 		// append a 'group' element to 'svg'
 		// moves the 'group' element to the top left margin
@@ -232,9 +231,9 @@ d3.csv("alcohol2.csv").then(function(data) {
 			.attr("height", height + margin.top + margin.bottom)
 		  .append("g")
 			.attr("transform", 
-				  "translate(" + margin.left + "," + margin.top + ")");
+				  "translate(" + margin.left + "," + margin.top + ")");	
 
-		// get the data
+	    // get the data
 		// create the array "raw" to hold the input
 		d3.csv("alcohol2.csv").then(function(data) {
 		  // re-format numeric data
@@ -264,23 +263,32 @@ d3.csv("alcohol2.csv").then(function(data) {
 		  // Scale for the outcome (percent, ucl, lcl, etc.)
 		  y.domain([0,100]);
 		  
+		  
 		  // append the rectangles for the bar chart
 		  // First, append a placeholder for each sex
 		  var group = svg.selectAll("g")
 			  .data(groups)
 			.enter().append("g")
 			  .attr("transform", function(d) { return "translate(" + x0(d.key) + ",0)"; } );
-		
+	  
 		  // append a bar for each response to each sex
 		  // for each sex-response pair, extract the numeric percentage
 		  var response = group.selectAll("rect")
 			  .data(function(d){return d.values.map(function(j){ return {key:j.response, value:j.percent}; }); });	      
 		  response.enter().append("rect")
-			  .attr("class", function(d, i){ return "bar-" + i; })
+			  .attr("class", function(d, i){ return "bar bar-" + i; })
 			  .attr("x", function(d){ return x1(d.key); })
 			  .attr("width", x1.bandwidth())
 			  .attr("y", function(d) { return y(d.value); })
-			  .attr("height", function(d) { return height - y(d.value); });  
+			  .attr("height", function(d) { return height - y(d.value); })
+			  .on("mouseover", function() { tip.style("display", null); d3.select(this).attr("opacity",0.6); })
+			  .on("mouseout", function() { tip.style("display", "none"); d3.select(this).attr("opacity", null);})
+			  .on("mousemove", function(d){
+				var xLoc = d3.mouse(svg.node())[0] + 15;
+				var yLoc = d3.mouse(svg.node())[1] - 15;
+				tip.attr("transform", "translate(" + xLoc + "," + yLoc + ")");
+				tip.select("text").text(d.value + "%");
+			  });
 			  
 		   // draw a vertical line between UCL & LCL
 		   // orient the line in the middle of the bar
@@ -359,7 +367,25 @@ d3.csv("alcohol2.csv").then(function(data) {
 			  .attr("y", 9.5)
 			  .attr("dy", "0.32em")
 			  .text(function(d) { return d; });
-			});
+			 		  // Set up the tooltip
+			var tip = svg.append("g")
+			  .attr("class", "tip")
+			  .style("display", "none");
+			
+			tip.append("rect")
+			  .attr("width", 34)
+			  .attr("height", 25)
+			  .attr("fill", "#000")
+			  .style("opacity", 0.5);
+			  
+			tip.append("text")
+			  .attr("x", 16)
+			  .attr("dy", "1.2em")
+			  .style("text-anchor", "middle")
+			  .attr("fill", "#fff")
+			  .attr("font-size", "14px")
+			  .attr("font-weight", "bold");
+		});
 			
 		</script>
 	</body>
