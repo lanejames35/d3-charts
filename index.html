@@ -255,10 +255,10 @@ d3.csv("alcohol2.csv").then(function(data) {
 		  console.log(res);
 		 
 		  // Scale for the sexes
-		  x0.domain( groups.map(function(d){ return d.key; }) );
+		  x0.domain( res.map(function(d){ return d.key; }) );
 		  console.log(x0.domain());
 		  // Scale for the responses (yes/no)
-		  x1.domain( res.map(function(d){ return d.key; }) ).range([0, x0.bandwidth()]);
+		  x1.domain( group.map(function(d){ return d.key; }) ).range([0, x0.bandwidth()]);
 		  console.log(x1.domain());
 		  // Scale for the outcome (percent, ucl, lcl, etc.)
 		  y.domain([0,100]);
@@ -267,7 +267,7 @@ d3.csv("alcohol2.csv").then(function(data) {
 		  // append the rectangles for the bar chart
 		  // First, append a placeholder for each sex
 		  var group = svg.selectAll("g")
-			  .data(groups)
+			  .data(res)
 			.enter().append("g")
 			  .attr("transform", function(d) { return "translate(" + x0(d.key) + ",0)"; } );
 	  
@@ -367,7 +367,7 @@ d3.csv("alcohol2.csv").then(function(data) {
 			  .attr("y", 9.5)
 			  .attr("dy", "0.32em")
 			  .text(function(d) { return d; });
-			 		  // Set up the tooltip
+			// Set up the tooltip
 			var tip = svg.append("g")
 			  .attr("class", "tip")
 			  .style("display", "none");
