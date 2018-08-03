@@ -274,7 +274,7 @@ d3.csv("alcohol2.csv").then(function(data) {
 		  // append a bar for each response to each sex
 		  // for each sex-response pair, extract the numeric percentage
 		  var response = group.selectAll("rect")
-			  .data(function(d){return d.values.map(function(j){ return {key:j.sex, value:j.percent, ci:[j.lcl,j.ucl]}; }); });	      
+			  .data(function(d){return d.values.map(function(j){ return {key:j.sex, cat:j.response, value:j.percent, ci:[j.lcl,j.ucl]}; }); });	      
 		  response.enter().append("rect")
 			  .attr("class", function(d, i){ return "bar bar-" + i; })
 			  .attr("x", function(d){ return x1(d.key); })
@@ -287,7 +287,7 @@ d3.csv("alcohol2.csv").then(function(data) {
 				var xLoc = d3.mouse(svg.node())[0] + 15;
 				var yLoc = d3.mouse(svg.node())[1] - 15;
 				tip.attr("transform", "translate(" + xLoc + "," + yLoc + ")");
-				tip.select(".percent").text("Per cent: " + d.value + "%");
+				tip.select(".percent").text(d.cat + ": " + d.value + "%");
 				tip.select(".lcl").text("LCL: " + d.ci[0] + "%");
 				tip.select(".ucl").text("UCL: " + d.ci[1] + "%");
 			  });
@@ -375,8 +375,8 @@ d3.csv("alcohol2.csv").then(function(data) {
 			  .style("display", "none");
 			
 			tip.append("rect")
-			  .attr("width", 100)
-			  .attr("height", 75)
+			  .attr("width", 130)
+			  .attr("height", 68)
 			  .attr("fill", "#000")
 			  .style("opacity", 0.5);
 			  
