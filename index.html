@@ -258,7 +258,7 @@ d3.csv("alcohol2.csv").then(function(data) {
 		  x0.domain( res.map(function(d){ return d.key; }) );
 		  console.log(x0.domain());
 		  // Scale for the responses (yes/no)
-		  x1.domain( group.map(function(d){ return d.key; }) ).range([0, x0.bandwidth()]);
+		  x1.domain( groups.map(function(d){ return d.key; }) ).range([0, x0.bandwidth()]);
 		  console.log(x1.domain());
 		  // Scale for the outcome (percent, ucl, lcl, etc.)
 		  y.domain([0,100]);
@@ -274,7 +274,7 @@ d3.csv("alcohol2.csv").then(function(data) {
 		  // append a bar for each response to each sex
 		  // for each sex-response pair, extract the numeric percentage
 		  var response = group.selectAll("rect")
-			  .data(function(d){return d.values.map(function(j){ return {key:j.response, value:j.percent}; }); });	      
+			  .data(function(d){return d.values.map(function(j){ return {key:j.sex, value:j.percent, ci:[j.lcl,j.ucl]}; }); });	      
 		  response.enter().append("rect")
 			  .attr("class", function(d, i){ return "bar bar-" + i; })
 			  .attr("x", function(d){ return x1(d.key); })
@@ -287,13 +287,15 @@ d3.csv("alcohol2.csv").then(function(data) {
 				var xLoc = d3.mouse(svg.node())[0] + 15;
 				var yLoc = d3.mouse(svg.node())[1] - 15;
 				tip.attr("transform", "translate(" + xLoc + "," + yLoc + ")");
-				tip.select("text").text(d.value + "%");
+				tip.select(".percent").text("Per cent: " + d.value + "%");
+				tip.select(".lcl").text("LCL: " + d.ci[0] + "%");
+				tip.select(".ucl").text("UCL: " + d.ci[1] + "%");
 			  });
 			  
 		   // draw a vertical line between UCL & LCL
 		   // orient the line in the middle of the bar
 		   var vLine = group.selectAll(".verticalLines")
-			  .data(function(d){return d.values.map(function(j){ return {key:j.response, whiskers:[j.lcl,j.ucl]}; }); })
+			  .data(function(d){return d.values.map(function(j){ return {key:j.sex, whiskers:[j.lcl,j.ucl]}; }); })
 			  .enter()
 			  .append("line")
 			  .attr("x1", function(d){ return x1(d.key) + x1.bandwidth()/2; })
@@ -307,7 +309,7 @@ d3.csv("alcohol2.csv").then(function(data) {
 			  
 		   // draw two horizontal lines for the error bar "whiskers" (i.e. the hook at the top and bottom)
 		   var hLine1 = group.selectAll(".horizontal")
-			  .data(function(d){return d.values.map(function(j){ return {key:j.response, whiskers:[j.lcl,j.ucl]}; }); })
+			  .data(function(d){return d.values.map(function(j){ return {key:j.sex, whiskers:[j.lcl,j.ucl]}; }); })
 			  .enter()
 			  .append("line")
 			  .attr("x1", function(d){ return x1(d.key); })
@@ -320,7 +322,7 @@ d3.csv("alcohol2.csv").then(function(data) {
 			  
 		   // Repeat with the other confidence limit
 		   var hLine2 = group.selectAll(".horizontal")
-			  .data(function(d){return d.values.map(function(j){ return {key:j.response, whiskers:[j.lcl,j.ucl]}; }); })
+			  .data(function(d){return d.values.map(function(j){ return {key:j.sex, whiskers:[j.lcl,j.ucl]}; }); })
 			  .enter()
 			  .append("line")
 			  .attr("x1", function(d){ return x1(d.key); })
@@ -352,7 +354,7 @@ d3.csv("alcohol2.csv").then(function(data) {
 			  .attr("font-size", 14)
 			  .attr("text-anchor", "end")
 			.selectAll("g")
-			.data(res.map(function(d){ return d.key }) )
+			.data(groups.map( function(d){ return d.key }) )
 			.enter().append("g")
 			  .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
@@ -373,15 +375,34 @@ d3.csv("alcohol2.csv").then(function(data) {
 			  .style("display", "none");
 			
 			tip.append("rect")
-			  .attr("width", 34)
-			  .attr("height", 25)
+			  .attr("width", 100)
+			  .attr("height", 75)
 			  .attr("fill", "#000")
 			  .style("opacity", 0.5);
 			  
 			tip.append("text")
-			  .attr("x", 16)
-			  .attr("dy", "1.2em")
-			  .style("text-anchor", "middle")
+			  .attr("class","percent")
+			  .attr("x", 7)
+			  .attr("dy", "1.5em")
+			  .style("text-anchor", "start")
+			  .attr("fill", "#fff")
+			  .attr("font-size", "14px")
+			  .attr("font-weight", "bold");
+			  
+			tip.append("text")
+			  .attr("class","lcl")
+			  .attr("x", 7)
+			  .attr("dy", "2.75em")
+			  .style("text-anchor", "start")
+			  .attr("fill", "#fff")
+			  .attr("font-size", "14px")
+			  .attr("font-weight", "bold");
+			  
+			tip.append("text")
+			  .attr("class","ucl")
+			  .attr("x", 7)
+			  .attr("dy", "4em")
+			  .style("text-anchor", "start")
 			  .attr("fill", "#fff")
 			  .attr("font-size", "14px")
 			  .attr("font-weight", "bold");
