@@ -7,7 +7,10 @@
 		<link href="theme.min.css" rel="stylesheet">
 		<link href="https://fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet"> 
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+		<link rel="stylesheet" href="https:////cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
 		<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js"></script>
+		<script src="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"></script>
 		<style>
 		  .bar-0, .legend-0{
 		    fill: #990033;
@@ -36,6 +39,12 @@
 					<div id="theChart"></div>
 				</div>
 			</div>
+			<div class="row">
+				<div class="col-xs-12">
+					<h2>Table</h2>
+					<div id="theTable"></div>
+				<div>
+			<div>
 			<div class="row">
 				<div class="col-xs-12">
 					<h2>alcohol2.csv</h2>
@@ -408,6 +417,11 @@ d3.csv("alcohol2.csv").then(function(data) {
 			  .attr("font-weight", "bold");
 		});
 			
+		</script>
+		<script>
+			$('#theTable').dataTable({
+				"data": d3.csvParse("alcohol2.csv")
+			});
 		</script>
 	</body>
 </html>
