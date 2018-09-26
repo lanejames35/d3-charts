@@ -43,8 +43,8 @@
 				<div class="col-xs-12">
 					<h2>Table</h2>
 					<div id="theTable"></div>
-				<div>
-			<div>
+				</div>
+			</div>
 			<div class="row">
 				<div class="col-xs-12">
 					<h2>alcohol2.csv</h2>
@@ -419,9 +419,11 @@ d3.csv("alcohol2.csv").then(function(data) {
 			
 		</script>
 		<script>
-			$('#theTable').dataTable({
+		$(document).ready(function(){
+			$('#theTable').DataTable({
 				"data": d3.csvParse("alcohol2.csv")
 			});
+		} );
 		</script>
 	</body>
 </html>
