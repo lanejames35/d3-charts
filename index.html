@@ -421,14 +421,8 @@ d3.csv("alcohol2.csv").then(function(data) {
 		<script>
 		$(document).ready(function(){
 			d3.csv("alcohol2.csv").then(function(input){
-				var clean = input.forEach(function(d){
-					d.percent = +d.percent;
-					d.count = +d.count;
-					d.ucl = +d.ucl;
-					d.lcl = +d.lcl;
-				});	
-			});	
-			$('#theTable').DataTable( {data: clean} );			
+				$('#theTable').DataTable( {"data": input} );
+			});
 		} );
 		</script>
 	</body>
