@@ -420,10 +420,9 @@ d3.csv("alcohol2.csv").then(function(data) {
 		</script>
 		<script>
 		$(document).ready(function(){
-			var input = d3.csvParse("alcohol2.csv");
-			$('#theTable').DataTable({
-				data: input
-			});
+			d3.csv("alcohol2.csv").then(function(data){
+				$('#theTable').DataTable( {data: data} );
+			});		
 		} );
 		</script>
 	</body>
