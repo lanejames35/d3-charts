@@ -8,7 +8,6 @@
 		<link href="https://fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet"> 
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
 		<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
-		<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
 		<style>
@@ -42,175 +41,7 @@
 			<div class="row">
 				<div class="col-xs-12">
 					<h2>Table</h2>
-					<table id="theTable"></table>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-xs-12">
-					<h2>alcohol2.csv</h2>
-					<pre class="prettyprint linenums">
-sex,response,count,percent,lcl,ucl
-"Male","Yes",632,85.0,82.1,88.0
-"Male","No",120,15.0,12.0,17.9
-"Male","I don't know",111,20,12,22
-"Female","Yes",871,60,59.2,62.0
-"Female","No",182,40,33.0,42
-"Female","I don't know",111,10,5,12
-					</pre>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-xs-12">	
-					<div class="pretty">
-						<h2>JS code</h2>
-						<pre class="prettyprint linenums">
-// set the dimensions and margins of the graph
-var margin = {top: 20, right: 20, bottom: 30, left: 40},
-	width = 960 - margin.left - margin.right,
-	height = 500 - margin.top - margin.bottom;
-
-// set the ranges
-// x0 = outer scale for the groups (i.e. demographics)
-// x1 = inner scale for the response options
-var x0 = d3.scaleBand()
-		  .range([0, width])
-		  .padding(0.1);
-var x1 = d3.scaleBand().padding(0.05);
-var y = d3.scaleLinear()
-		  .range([height, 0]);
-		  
-// append the svg object to the body of the page
-// append a 'group' element to 'svg'
-// moves the 'group' element to the top left margin
-var svg = d3.select("#theChart").append("svg")
-	.attr("width", width + margin.left + margin.right)
-	.attr("height", height + margin.top + margin.bottom)
-  .append("g")
-	.attr("transform", 
-		  "translate(" + margin.left + "," + margin.top + ")");
-
-// Get the data
-// In production this file would be retreived 
-// from the Durham Region Open Data API.
-// For now, a static file will do!
-d3.csv("alcohol2.csv").then(function(data) {
-  // re-format char to numeric data
-  data.forEach(function(d){
-	d.percent = +d.percent;
-	d.ucl = +d.ucl;
-	d.lcl = +d.lcl;
-  });	
-  // Get the groups
-  var groups = d3.nest()
-	.key(function(d){ return d.sex; })
-	.entries(data);
-  console.log(groups);
-  
-  // Get the responses
-  var res = d3.nest()
-	.key(function(d) {return d.response; })
-	.entries(data);
-  console.log(res);
- 
-  // Scale for the sexes
-  x0.domain( groups.map(function(d){ return d.key; }) );
-  console.log(x0.domain());
-  // Scale for the responses (yes/no)
-  x1.domain( res.map(function(d){ return d.key; }) ).range([0, x0.bandwidth()]);
-  console.log(x1.domain());
-  // Scale for the outcome (percent, ucl, lcl, etc.)
-  y.domain([0,100]);
-  
-  // append the rectangles for the bar chart
-  // First, append a placeholder for each sex
-  var group = svg.selectAll("g")
-	  .data(groups)
-	.enter().append("g")
-	  .attr("transform", function(d) { return "translate(" + x0(d.key) + ",0)"; } );
-
-  // append a bar for each response to each sex
-  // for each sex-response pair, extract the numeric percentage
-  var response = group.selectAll("rect")
-	  .data(function(d){return d.values.map(function(j){ return {key:j.response, value:j.percent}; }); });	      
-  response.enter().append("rect")
-	  .attr("class", function(d, i){ return "bar-" + i; })
-	  .attr("x", function(d){ return x1(d.key); })
-	  .attr("width", x1.bandwidth())
-	  .attr("y", function(d) { return y(d.value); })
-	  .attr("height", function(d) { return height - y(d.value); });  
-	  
-  // draw a vertical line between UCL &amp; LCL
-  // orient the line in the middle of the bar
-  var vLine = group.selectAll(".verticalLines")
-	  .data(function(d){return d.values.map(function(j){ return {key:j.response, whiskers:[j.lcl,j.ucl]}; }); })
-	  .enter()
-	  .append("line")
-	  .attr("x1", function(d){ return x1(d.key) + x1.bandwidth()/2; })
-	  .attr("y1", function(d){ return y(d.whiskers[0]); })
-	  .attr("x2", function(d){ return x1(d.key) + x1.bandwidth()/2; })
-	  .attr("y2", function(d){ return y(d.whiskers[1]); })
-	  .attr("class", "whisker")
-	  .attr("stroke", "#000")
-	  .attr("stroke-width", 2)
-	  .attr("fill", "none");
-	  
-  // draw two horizontal lines for the error bar "whiskers" (i.e. the hook at the top and bottom)
-  var hLine1 = group.selectAll(".horizontal")
-	  .data(function(d){return d.values.map(function(j){ return {key:j.response, whiskers:[j.lcl,j.ucl]}; }); })
-	  .enter()
-	  .append("line")
-	  .attr("x1", function(d){ return x1(d.key); })
-	  .attr("y1", function(d){ return y(d.whiskers[0]); })
-	  .attr("x2", function(d){ return x1(d.key) + x1.bandwidth()/10; })
-	  .attr("y2", function(d){ return y(d.whiskers[0]); })
-	  // bump the whisker over to centre it with the vertical line
-	  .attr("transform", "translate(" + x1.bandwidth()*9/20 + ",0)")
-	  .attr("class", "whisker-bottom");
-	  
-  // Repeat with the other confidence limit
-  var hLine2 = group.selectAll(".horizontal")
-	  .data(function(d){return d.values.map(function(j){ return {key:j.response, whiskers:[j.lcl,j.ucl]}; }); })
-	  .enter()
-	  .append("line")
-	  .attr("x1", function(d){ return x1(d.key); })
-	  .attr("y1", function(d){ return y(d.whiskers[1]); })
-	  .attr("x2", function(d){ return x1(d.key) + x1.bandwidth()/10; })
-	  .attr("y2", function(d){ return y(d.whiskers[1]); })
-	  .attr("transform", "translate(" + x1.bandwidth()*9/20 + ",0)")
-	  .attr("class", "whisker-top");
-	  
-  // add the x Axis
-  svg.append("g")
-	  .attr("transform", "translate(0," + height + ")")
-	  .call(d3.axisBottom(x0));
-
-  // add the y Axis
-  svg.append("g")
-	  .call(d3.axisLeft(y));
-	  
-  // add the legend
-  var legend = svg.append("g")
-	  .attr("font-family", "sans-serif")
-	  .attr("font-size", 10)
-	  .attr("text-anchor", "end")
-	.selectAll("g")
-	.data(res.map(function(d){ return d.key }) )
-	.enter().append("g")
-	  .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-
-	legend.append("rect")
-	  .attr("x", width - 19)
-	  .attr("width", 19)
-	  .attr("height", 19)
-	  .attr("class", function(d, i){ return "legend-" + i; });
-
-	legend.append("text")
-	  .attr("x", width - 24)
-	  .attr("y", 9.5)
-	  .attr("dy", "0.32em")
-	  .text(function(d) { return d; });
-	});
-					</pre>
+					<div id="theTable"></div>
 				</div>
 			</div>
 		</main>
@@ -419,11 +250,56 @@ d3.csv("alcohol2.csv").then(function(data) {
 			
 		</script>
 		<script>
-		$(document).ready(function(){
-			d3.csv("alcohol2.csv").then(function(input){
-				$('#theTable').DataTable( {"data": input} );
-			});
-		} );
+		d3.csv("alcohol2.csv").then(function(data){
+
+		  function tabulate(data, columns) {
+				var table = d3.select('#theTable').append('table').attr('id','table1')
+				var thead = table.append('thead')
+				var	tbody = table.append('tbody');
+
+				// append the header row
+				thead.append('tr')
+				  .selectAll('th')
+				  .data(columns).enter()
+				  .append('th')
+					.text(function (column) { return column; });
+
+				// create a row for each object in the data
+				var rows = tbody.selectAll('tr')
+				  .data(data)
+				  .enter()
+				  .append('tr');
+
+				// create a cell in each row for each column
+				var cells = rows.selectAll('td')
+				  .data(function (row) {
+					return columns.map(function (column) {
+					  return {column: column, value: row[column]};
+					});
+				  })
+				  .enter()
+				  .append('td')
+					.text(function (d) { return d.value; });
+
+			  return table;
+			}
+
+			// render the table(s)
+			tabulate(data, data.columns);
+			$('#table1').DataTable( {
+				columns: [
+					{ "title" : "Sex" },
+					{ "title" : "Response" },
+					{ "title" : "Count" },
+					{ "title" : "Per cent" },
+					{ "title" : "Lower confidence limit" },
+					{ "title" : "Upper confidence limit" }
+				],
+				info: false,
+				paging: false,
+				searching: false
+			} );
+		});
 		</script>
 	</body>
 </html>
